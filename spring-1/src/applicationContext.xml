@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--
+    两种方式配置bean的属性：
+    1.使用property配置(实际是使用无参构造器，然后调用setter方法配置属性)
+    2.使用constructor-arg配置bean(实际是通过调用相应的构造器配置属性)
+    -->
+    <!--
+    配置 bean
+     class: bean的全名, 通过反射的方式在IOC容器中创建Bean. 所以要求bean中必须有无参数的构造器
+     id: 标识容器中的bean, id唯一
+     -->
+    <bean id="helloWorld2" class="com.sweeky.xss.beans.HelloWorld">
+        <!-- name为setter方法的名称,并非类中的私有变量名称 -->
+        <property name="name2" value="王芬梅"></property>
+    </bean>
+
+    <!-- 通过构造方法来配置bean的属性-->
+    <bean id="car" class="com.sweeky.xss.beans.Car">
+        <constructor-arg value="Audi" index="0"></constructor-arg>
+        <constructor-arg value="ShangHai" index="1"></constructor-arg>
+        <constructor-arg value="300000" index="2"></constructor-arg>
+    </bean>
+
+    <!-- index 是参数在构造器中的index-->
+    <!--使用构造器注入属性可以指定参数的位置和参数的类型 以区分重载的构造器-->
+    <bean id="car2" class="com.sweeky.xss.beans.Car">
+        <constructor-arg value="Baoma" index="0" type="java.lang.String"></constructor-arg>
+        <!--也可以使用value子节点的方式设置value值-->
+        <constructor-arg index="2" type="int">
+            <value>240</value>
+        </constructor-arg>
+        <!--如果字面值包含特殊字符可以使用 <![CDATA[]]> 包裹起来-->
+        <constructor-arg index="1" type="java.lang.String">
+            <value><![CDATA[<ShangHai!~^>]]></value>
+        </constructor-arg>
+    </bean>
+
+    <bean id="person" class="com.sweeky.xss.beans.Person">
+        <property name="name" value="王芬梅"></property>
+        <property name="age" value="27"></property>
+        <!--可以使用property的ref属性建立bean之间的引用关系.-->
+        <!--
+        <property name="car" ref="car2"></property>
+        -->
+        <!--
+        <property name="car">
+            <ref bean="car2"></ref>
+        </property>
+        -->
+        <!-- 内部bean, 不能被外部使用. 只能在内部使用 -->
+        <property name="car">
+            <bean class="com.sweeky.xss.beans.Car">
+                <constructor-arg value="Ford"></constructor-arg>
+                <constructor-arg value="Changan"></constructor-arg>
+                <constructor-arg value="200000"></constructor-arg>
+            </bean>
+        </property>
+    </bean>
+
+    <bean name="person2" class="com.sweeky.xss.beans.Person">
+        <constructor-arg value="王芬梅"></constructor-arg>
+        <constructor-arg value="27"></constructor-arg>
+        <constructor-arg ref="car"></constructor-arg>
+    </bean>
+    <bean name="person3" class="com.sweeky.xss.beans.Person"
+          p:name="wfm" p:age="27" p:car-ref="car">
+
+    </bean>
+    <!--
+    <bean id="helloWorld" class="com.sweeky.xss.beans.HelloWorld">
+        <property name="name2" value="王芬梅"></property>
+    </bean>
+    -->
+</beans>
